@@ -126,8 +126,9 @@ class GraphsController < ApplicationController
             counts = issue_counts[project_id].sort { |a,b| a["date"]<=>b["date"] }         
             created_count = 0
             created_on_line = Hash.new
-            created_on_line[(Date.parse(counts.first["date"])-1).to_s] = 0
-            counts.each { |count| created_count += count["issue_count"].to_i; created_on_line[count["date"]] = created_count }
+            first_counts_date = counts.first["date"].is_a?(Date) ? counts.first["date"] : Date.parse(counts.first["date"])
+            created_on_line[(first_counts_date - 1.day).to_s] = 0
+            counts.each { |count| created_count += count["issue_count"].to_i; created_on_line[count["date"].is_a?(Date) ? count["date"].to_s : Date.parse(count["date"]).to_s] = created_count }
             created_on_line[Date.today.to_s] = created_count
             graph.add_data({
                 :data => created_on_line.sort.flatten,
